@@ -3,7 +3,10 @@ import { mount } from "@vue/test-utils";
 
 import App from "@/App.vue";
 import { createPinia } from "pinia/dist/pinia";
-import { RULE } from "@/domain/password/rules";
+import {
+  RULE,
+  RULE_NOT_EXCLUSIVE_SPEC_SYMBOLS_LIST,
+} from "@/domain/password/rules";
 import { useStrongPasswordStore } from "@/stores/strong-password";
 import {
   StrengthOption,
@@ -36,8 +39,6 @@ describe("App", () => {
   });
 
   describe("rules indicators", () => {
-    const NOT_EXCLUSIVE_SPEC_SYMBOLS_LIST = "$%^& _-+*()@!";
-
     const examples = [
       {
         password: "",
@@ -59,7 +60,7 @@ describe("App", () => {
         passedRules: [RULE.OneLetter, RULE.OneNumber],
         description: "upper and lower char",
       },
-      ...NOT_EXCLUSIVE_SPEC_SYMBOLS_LIST.split("").map((specialChar) => ({
+      ...RULE_NOT_EXCLUSIVE_SPEC_SYMBOLS_LIST.split("").map((specialChar) => ({
         password: `a${specialChar}p`,
         passedRules: [RULE.SpecialSymbol, RULE.OneLetter],
         description: "special char",
@@ -173,6 +174,19 @@ describe("App", () => {
           await setPasswordTo(password);
           expect(wrapper.get('[data-test="validation-summary"]').text()).toBe(
             StrengthOptionLabel[StrengthOption.Strong]
+          );
+        }
+      );
+    });
+
+    describe("when password is empty", () => {
+      const examples = [""];
+      it.each(examples)(
+        "should indicate password strenght as not decided yet for empty password",
+        async (password) => {
+          await setPasswordTo(password);
+          expect(wrapper.get('[data-test="validation-summary"]').text()).toBe(
+            StrengthOptionLabel[StrengthOption.Undecided]
           );
         }
       );
