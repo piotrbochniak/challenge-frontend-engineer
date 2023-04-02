@@ -1,0 +1,16 @@
+version: 1.0
+configuration:
+  has_webserver: true
+  scoring:
+    command: yarn && yarn test:unit --watch=false --reporter=junit --outputFile.junit=../unit.xml
+    files:
+      - unit.xml
+  readonly_paths:
+    - src/__tests__/.*
+  ide_config:
+    default_open_files:
+      - src/main.js
+    project_menu:
+      run: yarn dev --port 8000 --host
+      install: yarn install
+      test: yarn && yarn test:unit --watch=false
